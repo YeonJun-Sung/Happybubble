@@ -60,7 +60,7 @@ public class Select_Picture_Adapter extends BaseAdapter{
         ImageView iv = (ImageView)view.findViewById(R.id.select_picture);
         iv.setFocusable(false);
 
-        iv.setImageResource(R.drawable.goo);
+        iv.setImageResource(Integer.parseInt(item.getImageID()));
 
         TextView text = (TextView)view.findViewById(R.id.select_text);
         text.setText(item.getName());

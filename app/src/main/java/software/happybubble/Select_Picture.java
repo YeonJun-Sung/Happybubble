@@ -26,7 +26,7 @@ public class Select_Picture extends AppCompatActivity {
         picture_listview = (ListView)findViewById(R.id.listview_select_picture);
         Select_Picture_Adapter adapter = new Select_Picture_Adapter(this, R.layout.select_list, list_picture);
 
-        list_picture.add(new Select_List("Goo"));
+        list_picture.add(new Select_List("R.drawable.goo", "Goo"));
 
         picture_listview.setAdapter(adapter);
         picture_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
