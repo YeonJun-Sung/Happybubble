@@ -36,7 +36,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
 
     ImageView imageVIewInput;
     ImageView imageVIewOuput;
-    Button camera, album, doit;
+    Button camera, album, doitR, doitG, doitB;
     private Mat img_input;
     private Mat img_output;
     static final int REQUEST_CAMERA = 1;
@@ -115,7 +115,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
                         }else
                         {
                             read_image_file();
-                            imageprocess_and_showResult();
+                            imageprocess_and_showResult(0);
                         }
                     }
                 }
@@ -154,7 +154,9 @@ public class ImageProcessingActivity extends AppCompatActivity {
         imageVIewOuput = (ImageView)findViewById(R.id.imageViewOutput);
         camera = (Button)findViewById(R.id.camera);
         album = (Button)findViewById(R.id.album);
-        doit = (Button)findViewById(R.id.doit);
+        doitR = (Button)findViewById(R.id.doitR);
+        doitG = (Button)findViewById(R.id.doitG);
+        doitB = (Button)findViewById(R.id.doitB);
 
         if (!hasPermissions(PERMISSIONS))//퍼미션 허가를 했었는지 여부를 확인
             requestNecessaryPermissions(PERMISSIONS);//퍼미션 허가안되어 있다면 사용자에게 요청
@@ -172,17 +174,27 @@ public class ImageProcessingActivity extends AppCompatActivity {
                     doTakeAlbumAction();
                 }
             });
-            doit.setOnClickListener(new View.OnClickListener(){
+            doitR.setOnClickListener(new View.OnClickListener(){
                 @Override
-                public void onClick(View view) { imageprocess_and_showResult();
+                public void onClick(View view) { imageprocess_and_showResult(0);
+                }
+            });
+            doitG.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) { imageprocess_and_showResult(1);
+                }
+            });
+            doitB.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) { imageprocess_and_showResult(2);
                 }
             });
         }
     }
 
-    private void imageprocess_and_showResult() {
+    private void imageprocess_and_showResult(int color) {
 
-        imageprocessing(img_input.getNativeObjAddr(), img_output.getNativeObjAddr());
+        imageprocessing(img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), color);
 
         Bitmap bitmapOutput = Bitmap.createBitmap(img_output.cols(), img_output.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(img_output, bitmapOutput);
@@ -232,8 +244,8 @@ public class ImageProcessingActivity extends AppCompatActivity {
                     Bundle extras = data.getExtras();
                     if(extras != null) {
                         bm = extras.getParcelable("data");
-                        imageVIewInput.setImageBitmap(rotate(bm));
-                        Utils.bitmapToMat(rotate(bm), img_input);
+                        imageVIewInput.setImageBitmap(bm);
+                        Utils.bitmapToMat(bm, img_input);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -241,8 +253,8 @@ public class ImageProcessingActivity extends AppCompatActivity {
             } else if (requestCode == 2 && !data.equals(null)) {
                 try {
                     bm = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
-                    imageVIewInput.setImageBitmap(rotate(bm));
-                    Utils.bitmapToMat(rotate(bm), img_input);
+                    imageVIewInput.setImageBitmap(bm);
+                    Utils.bitmapToMat(bm, img_input);
                     imageVIewInput.setScaleType(ImageView.ScaleType.FIT_XY);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -250,17 +262,11 @@ public class ImageProcessingActivity extends AppCompatActivity {
             }
         }
     }
-    public Bitmap rotate(Bitmap src) {
-        Matrix matrix = new Matrix();
-
-        matrix.postRotate(90);
-        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
-    }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
     public native void originImage(long img);
-    public native void imageprocessing(long inputImage, long outputImage);
+    public native void imageprocessing(long inputImage, long outputImage, int color);
 }
