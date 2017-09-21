@@ -24,6 +24,21 @@ public class MainActivity extends AppCompatActivity {
         rc.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+        select_button = (Button)findViewById(R.id.select_picture);
+        select_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), Select_Picture.class);
+                startActivity(intent);
+            }
+        });
+
+        /*
+        // Example of a call to a native method
+        TextView tv = (TextView) findViewById(R.id.sample_text);
+        tv.setText(stringFromJNI());
+        */
+    }
 
             }
         });
