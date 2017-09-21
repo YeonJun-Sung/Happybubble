@@ -10,8 +10,8 @@ public class Select_List extends AppCompatActivity{
     private String ImageID;
     private String Name;
 
-    public Select_List(String Name){
-        //this.ImageID = ImageID;
+    public Select_List(String ImageID, String Name){
+        this.ImageID = ImageID;
         this.Name = Name;
     }
 
