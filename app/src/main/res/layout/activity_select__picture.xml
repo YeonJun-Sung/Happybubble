@@ -7,4 +7,10 @@
     android:orientation="vertical"
     tools:context="software.happybubble.Select_Picture">
 
+    <ListView
+        android:id="@+id/listview_select_picture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </ListView>
 </LinearLayout>
