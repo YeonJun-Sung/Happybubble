@@ -15,7 +15,7 @@ Java_software_happybubble_ImageProcessingActivity_originImage(
 
     Mat &img_input = *(Mat *) addrInputImage;
 
-    //cvtColor( img_input, img_input, CV_BGR2RGB);
+    cvtColor( img_input, img_input, CV_BGR2RGB);
 }
 
 JNIEXPORT void JNICALL
@@ -28,7 +28,7 @@ Java_software_happybubble_ImageProcessingActivity_imageprocessing(
     Mat &img_input = *(Mat *) addrInputImage;
     Mat &img_output = *(Mat *) addrOutputImage;
 
-    //cvtColor( img_input, img_output, CV_RGB2GRAY);
+    cvtColor( img_input, img_output, CV_RGB2GRAY);
     //
     blur( img_output, img_output, Size(1,1) );
     Canny( img_output, img_output, 50, 150, 5 );

@@ -159,6 +159,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
         if (!hasPermissions(PERMISSIONS))//퍼미션 허가를 했었는지 여부를 확인
             requestNecessaryPermissions(PERMISSIONS);//퍼미션 허가안되어 있다면 사용자에게 요청
         else {
+            read_image_file();
             camera.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
