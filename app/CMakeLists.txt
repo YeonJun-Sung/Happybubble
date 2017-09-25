@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set(OpenCV_DIR C:/OpenCV-android-sdk/sdk/native/jni)
-set(pathProject C:/androidProject/HappyBubble)
+set(pathProject C:/Users/SAMSUNG/Desktop/HappyBubble)
 find_package(OpenCV REQUIRED)
 
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -18,7 +18,7 @@ include_directories(${OpenCV_DIR}/include)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-add_library( # Sets the name of the library.
+add_library( # Specifies the name of the library.
              native-lib
 
              # Sets the library as a shared library.

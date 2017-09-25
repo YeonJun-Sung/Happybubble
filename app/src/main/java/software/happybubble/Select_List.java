@@ -7,18 +7,18 @@ import android.support.v7.app.AppCompatActivity;
  */
 
 public class Select_List extends AppCompatActivity{
-    private String ImageID;
+    private int ImageID;
     private String Name;
 
-    public Select_List(String ImageID, String Name){
+    public Select_List(int ImageID, String Name){
         this.ImageID = ImageID;
         this.Name = Name;
     }
 
-    public String getImageID(){
+    public int getImageID(){
         return ImageID;
     }
-    public void setImageID(String ImageID){
+    public void setImageID(int ImageID){
         this.ImageID = ImageID;
     }
     public String getName(){
