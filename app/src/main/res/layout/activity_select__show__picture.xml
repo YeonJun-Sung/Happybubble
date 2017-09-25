@@ -16,7 +16,6 @@
     <TextView
         android:layout_marginTop="20dp"
         android:id="@+id/show_text"
-        android:textColor="#000000"
         android:textStyle="bold"
         android:textSize="20dp"
         android:layout_width="wrap_content"
@@ -33,24 +32,36 @@
             android:id="@+id/blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#0000FF"
             android:text="파랑"/>
 
         <Button
             android:id="@+id/red"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#FF0000"
             android:text="빨강"/>
 
         <Button
             android:id="@+id/yellow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#FFFF00"
             android:text="노랑"/>
 
         <Button
             android:id="@+id/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#000000"
             android:text="검정"/>
     </LinearLayout>
 
@@ -59,5 +70,8 @@
         android:id="@+id/draw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:textStyle="bold"
+        android:textColor="#000000"
         android:text="그리기"/>
 </LinearLayout>

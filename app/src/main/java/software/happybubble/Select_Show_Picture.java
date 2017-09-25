@@ -1,6 +1,7 @@
 package software.happybubble;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +44,7 @@ public class Select_Show_Picture extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 show_text.setText(blue.getText().toString());
+                show_text.setTextColor(Color.parseColor("#0000FF"));
             }
         });
 
@@ -50,6 +52,7 @@ public class Select_Show_Picture extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 show_text.setText(red.getText().toString());
+                show_text.setTextColor(Color.parseColor("#FF0000"));
             }
         });
 
@@ -57,6 +60,7 @@ public class Select_Show_Picture extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 show_text.setText(yellow.getText().toString());
+                show_text.setTextColor(Color.parseColor("#FFFF00"));
             }
         });
 
@@ -64,6 +68,7 @@ public class Select_Show_Picture extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 show_text.setText(black.getText().toString());
+                show_text.setTextColor(Color.parseColor("#000000"));
             }
         });
     }
