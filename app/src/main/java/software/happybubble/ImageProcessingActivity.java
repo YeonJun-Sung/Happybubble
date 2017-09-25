@@ -36,7 +36,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
 
     ImageView imageVIewInput;
     ImageView imageVIewOuput;
-    Button camera, album, doitR, doitG, doitB;
+    Button camera, album, doitR, doitG, doitB, doitK;
     private Mat img_input;
     private Mat img_output;
     static final int REQUEST_CAMERA = 1;
@@ -157,6 +157,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
         doitR = (Button)findViewById(R.id.doitR);
         doitG = (Button)findViewById(R.id.doitG);
         doitB = (Button)findViewById(R.id.doitB);
+        doitK = (Button)findViewById(R.id.doitK);
 
         if (!hasPermissions(PERMISSIONS))//퍼미션 허가를 했었는지 여부를 확인
             requestNecessaryPermissions(PERMISSIONS);//퍼미션 허가안되어 있다면 사용자에게 요청
@@ -187,6 +188,11 @@ public class ImageProcessingActivity extends AppCompatActivity {
             doitB.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) { imageprocess_and_showResult(2);
+                }
+            });
+            doitK.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) { imageprocess_and_showResult(3);
                 }
             });
         }

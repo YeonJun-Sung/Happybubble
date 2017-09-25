@@ -48,6 +48,12 @@
             android:id="@+id/doitB"
             android:textColor="#0000ff"
             android:text="doitB" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/doitK"
+            android:text="doitK" />
     </LinearLayout>
 
     <ImageView

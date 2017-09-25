@@ -42,6 +42,8 @@ Java_software_happybubble_ImageProcessingActivity_imageprocessing(
         inRange(img_output, Scalar(0, 200, 0, 255), Scalar(255, 255, 255, 255), temp_mask);
     else if(color == 2)
         inRange(img_output, Scalar(200, 0, 0, 255), Scalar(255, 255, 255, 255), temp_mask);
+    else if(color == 3)
+        inRange(img_output, Scalar(0, 0, 0, 255), Scalar(50, 50, 50, 255), temp_mask);
     img_input.copyTo(img_output, temp_mask);
 }
 
