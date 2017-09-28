@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context="software.happybubble.ImageProcessingActivity">
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,8 +41,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/doitG"
-            android:textColor="#00ff00"
-            android:text="doitG" />
+            android:textColor="#ffff00"
+            android:text="doitY" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/doitK"
-            android:text="doitK" />
+            android:text="doitW" />
     </LinearLayout>
 
     <ImageView

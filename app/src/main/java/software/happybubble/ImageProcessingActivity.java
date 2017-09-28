@@ -200,7 +200,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
 
     private void imageprocess_and_showResult(int color) {
 
-        imageprocessing(img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), color);
+        imageProcessing(img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), color);
 
         Bitmap bitmapOutput = Bitmap.createBitmap(img_output.cols(), img_output.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(img_output, bitmapOutput);
@@ -273,6 +273,6 @@ public class ImageProcessingActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native void originImage(long img);
-    public native void imageprocessing(long inputImage, long outputImage, int color);
+    public native void imageLableing(long inputImage, long outputImage, int color);
+    public native void imageProcessing(long inputImage, long outputImage, int color);
 }
