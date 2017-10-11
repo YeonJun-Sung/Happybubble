@@ -40,7 +40,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/doitG"
+            android:id="@+id/doitY"
             android:textColor="#ffff00"
             android:text="doitY" />
         <Button
@@ -53,7 +53,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/doitK"
+            android:id="@+id/doitW"
             android:text="doitW" />
     </LinearLayout>
 

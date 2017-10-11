@@ -22,17 +22,19 @@ Java_software_happybubble_ImageProcessingActivity_imageProcessing(
     Mat &img_output = *(Mat *) addrOutputImage;
     Mat temp_mask;
 
-    __android_log_print(ANDROID_LOG_ERROR, "TRACKERS", "%d", color);
-    cvtColor(img_input, img_output, CV_BGR2RGB);
+    cvtColor(img_input, img_output, CV_BGR2HSV);
+
+    __android_log_print(ANDROID_LOG_ERROR, "COLOR", "%d", color);
 
     if(color == 0)
-        inRange(img_output, Scalar(0, 0, 200, 255), Scalar(50, 50, 255, 255), temp_mask);
+        inRange(img_output, Scalar(100, 100, 100), Scalar(120, 255, 255), temp_mask);
     else if(color == 1)
-        inRange(img_output, Scalar(200, 200, 0, 255), Scalar(255, 255, 50, 255), temp_mask);
+        inRange(img_output, Scalar(70, 100, 100), Scalar(90, 255, 255), temp_mask);
     else if(color == 2)
-        inRange(img_output, Scalar(200, 0, 0, 255), Scalar(255, 50, 50, 255), temp_mask);
+        inRange(img_output, Scalar(0, 100, 100), Scalar(20, 255, 255), temp_mask);
     else if(color == 3)
-        inRange(img_output, Scalar(230, 230, 230, 255), Scalar(255, 255, 255, 255), temp_mask);
+        inRange(img_output, Scalar(0, 0, 100), Scalar(0, 0, 255), temp_mask);
+
     img_input.copyTo(img_output, temp_mask);
 }
 
