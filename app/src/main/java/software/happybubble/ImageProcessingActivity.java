@@ -36,7 +36,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
 
     ImageView imageVIewInput;
     ImageView imageVIewOuput;
-    Button camera, album, doitR, doitG, doitB;
+    Button camera, album, doitR, doitY, doitB, doitW;
     private Mat img_input;
     private Mat img_output;
     static final int REQUEST_CAMERA = 1;
@@ -155,8 +155,9 @@ public class ImageProcessingActivity extends AppCompatActivity {
         camera = (Button)findViewById(R.id.camera);
         album = (Button)findViewById(R.id.album);
         doitR = (Button)findViewById(R.id.doitR);
-        doitG = (Button)findViewById(R.id.doitG);
+        doitY = (Button)findViewById(R.id.doitY);
         doitB = (Button)findViewById(R.id.doitB);
+        doitW = (Button)findViewById(R.id.doitW);
 
         if (!hasPermissions(PERMISSIONS))//퍼미션 허가를 했었는지 여부를 확인
             requestNecessaryPermissions(PERMISSIONS);//퍼미션 허가안되어 있다면 사용자에게 요청
@@ -179,7 +180,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
                 public void onClick(View view) { imageprocess_and_showResult(0);
                 }
             });
-            doitG.setOnClickListener(new View.OnClickListener(){
+            doitY.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) { imageprocess_and_showResult(1);
                 }
@@ -189,13 +190,16 @@ public class ImageProcessingActivity extends AppCompatActivity {
                 public void onClick(View view) { imageprocess_and_showResult(2);
                 }
             });
+            doitW.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) { imageprocess_and_showResult(3);
+                }
+            });
         }
     }
 
     private void imageprocess_and_showResult(int color) {
-
-        imageprocessing(img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), color);
-
+        imageProcessing(img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), color);
         Bitmap bitmapOutput = Bitmap.createBitmap(img_output.cols(), img_output.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(img_output, bitmapOutput);
         imageVIewOuput.setImageBitmap(bitmapOutput);
@@ -267,6 +271,6 @@ public class ImageProcessingActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native void originImage(long img);
-    public native void imageprocessing(long inputImage, long outputImage, int color);
+    public native void imageLableing(long inputImage, long outputImage, int color);
+    public native void imageProcessing(long inputImage, long outputImage, int color);
 }
