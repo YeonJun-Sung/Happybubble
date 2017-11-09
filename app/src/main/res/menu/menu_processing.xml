@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/origin"
+        android:title="원본 보기"
+        app:showAsAction="withText"/>
+    <item
+        android:id="@+id/setsize"
+        android:title="용지 설정"
+        app:showAsAction="withText"/>
+</menu>
