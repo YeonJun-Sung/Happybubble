@@ -10,4 +10,9 @@
         android:id="@+id/setsize"
         android:title="용지 설정"
         app:showAsAction="withText"/>
+    <item
+        android:id="@+id/draw"
+        android:title="그리기"
+        app:showAsAction="withText"/>
+
 </menu>

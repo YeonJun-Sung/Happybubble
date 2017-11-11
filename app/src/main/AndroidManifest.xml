@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA2" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -20,6 +21,7 @@
         </activity>
         <activity android:name=".SelectClipart" />
         <activity android:name=".PictureProcessing" />
+        <activity android:name=".DrawingState" />
         <activity android:name=".ImageProcessingActivity"
             android:hardwareAccelerated="false"/>
     </application>

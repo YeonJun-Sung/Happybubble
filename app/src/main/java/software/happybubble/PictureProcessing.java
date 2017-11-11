@@ -39,11 +39,12 @@ public class PictureProcessing extends AppCompatActivity {
     EditText widthText, heightText;
     Button rBt, gBt, bBt;
     SeekBar rBar, gBar, bBar;
-    int[] cValue = new int[3];
+    int[] cValue = {0, 0, 0};
     int[] paperSize = {1000, 1000};
     Mat img_input, img_colorOutput, img_binaryOutput;
     static final int PERMISSION_REQUEST_CODE = 1;
     String[] PERMISSIONS  = {"android.permission.WRITE_EXTERNAL_STORAGE"};
+    Boolean checkBinary = false;
     Activity activity;
 
     static {
@@ -66,6 +67,7 @@ public class PictureProcessing extends AppCompatActivity {
         rBar = (SeekBar)findViewById(R.id.rBar);
         gBar = (SeekBar)findViewById(R.id.gBar);
         bBar = (SeekBar)findViewById(R.id.bBar);
+        setButtonsBackgroundColor();
 
         try {
             Intent intent = getIntent();
@@ -87,21 +89,21 @@ public class PictureProcessing extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     imageprocess_and_showResult();
-                    Toast.makeText(getApplicationContext(),"R value : " + cValue[0],Toast.LENGTH_SHORT).show();
+                    checkBinary = true;
                 }
             });
             gBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     imageprocess_and_showResult();
-                    Toast.makeText(getApplicationContext(),"G value : " + cValue[1],Toast.LENGTH_SHORT).show();
+                    checkBinary = true;
                 }
             });
             bBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     imageprocess_and_showResult();
-                    Toast.makeText(getApplicationContext(),"B value : " + cValue[2],Toast.LENGTH_SHORT).show();
+                    checkBinary = true;
                 }
             });
         }
@@ -165,12 +167,12 @@ public class PictureProcessing extends AppCompatActivity {
     }
 
     public void setButtonsBackgroundColor(){
-        rBt.setBackgroundColor(Color.rgb(cValue[0],cValue[1],cValue[2]));
-        gBt.setBackgroundColor(Color.rgb(cValue[0],cValue[1],cValue[2]));
-        bBt.setBackgroundColor(Color.rgb(cValue[0],cValue[1],cValue[2]));
-        rBt.setTextColor(Color.rgb(255 - cValue[0],255 - cValue[1],255 - cValue[2]));
-        gBt.setTextColor(Color.rgb(255 - cValue[0],255 - cValue[1],255 - cValue[2]));
-        bBt.setTextColor(Color.rgb(255 - cValue[0],255 - cValue[1],255 - cValue[2]));
+        rBt.setBackgroundColor(Color.rgb(cValue[0], cValue[1], cValue[2]));
+        gBt.setBackgroundColor(Color.rgb(cValue[0], cValue[1], cValue[2]));
+        bBt.setBackgroundColor(Color.rgb(cValue[0], cValue[1], cValue[2]));
+        rBt.setTextColor(Color.rgb(255 - cValue[0], 255 - cValue[1], 255 - cValue[2]));
+        gBt.setTextColor(Color.rgb(255 - cValue[0], 255 - cValue[1], 255 - cValue[2]));
+        bBt.setTextColor(Color.rgb(255 - cValue[0], 255 - cValue[1], 255 - cValue[2]));
     }
 
     private void read_image_file() {
@@ -182,11 +184,6 @@ public class PictureProcessing extends AppCompatActivity {
     private void imageprocess_and_showResult() {
         read_image_file();
         Utils.bitmapToMat(inputImage, img_input);
-        float[] hsv = new float[3];
-        Color.RGBToHSV(cValue[0], cValue[1], cValue[2], hsv);
-        Log.d("h : ","" + hsv[0]);
-        Log.d("s : ","" + hsv[1] * 100);
-        Log.d("v : ","" + hsv[2] * 100);
         imageProcessing(img_input.getNativeObjAddr(), img_binaryOutput.getNativeObjAddr(), img_colorOutput.getNativeObjAddr(), cValue[0], cValue[1], cValue[2]);
         Bitmap bitmapOutput = Bitmap.createBitmap(img_colorOutput.cols(), img_colorOutput.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(img_colorOutput, bitmapOutput);
@@ -211,6 +208,7 @@ public class PictureProcessing extends AppCompatActivity {
                 Bitmap bitmapInput = Bitmap.createBitmap(img_input.cols(), img_input.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(img_input, bitmapInput);
                 showImage.setImageBitmap(bitmapInput);
+                checkBinary = false;
                 return true;
             case R.id.setsize:
                 alertW = new AlertDialog.Builder(activity);
@@ -267,6 +265,18 @@ public class PictureProcessing extends AppCompatActivity {
                     }
                 });
                 alertW.show();
+                return true;
+            case R.id.draw:
+                if (checkBinary) {
+                    Intent intent = new Intent(getApplicationContext(), DrawingState.class);
+                    Bitmap bitmapIntent = Bitmap.createBitmap(img_binaryOutput.cols(), img_binaryOutput.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(img_binaryOutput, bitmapIntent);
+                    intent.putExtra("img", bitmapIntent);
+                    intent.putExtra("size", paperSize);
+                    intent.putExtra("color", cValue);
+                    startActivity(intent);
+                }
+                else if (!checkBinary) Toast.makeText(getApplicationContext(),"색상을 선택해주세요.",Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);

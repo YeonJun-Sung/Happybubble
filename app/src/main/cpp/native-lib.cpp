@@ -1,10 +1,5 @@
 #include <jni.h>
 #include <opencv2/opencv.hpp>
-#include <opencv/highgui.h>
-#include <android/log.h>
-#include <android/asset_manager_jni.h>
-#include <string.h>
-#include <stdlib.h>
 
 using namespace cv;
 using namespace std;
@@ -18,9 +13,9 @@ Java_software_happybubble_PictureProcessing_imageProcessing(
         jlong addrInputImage,
         jlong addrBinaryOutputImage,
         jlong addrColorOutputImage,
-        jfloat h,
-        jfloat s,
-        jfloat v) {
+        jfloat colorR,
+        jfloat colorG,
+        jfloat colorB) {
 
     Mat &img_input = *(Mat *) addrInputImage;
     Mat &img_binaryOutput = *(Mat *) addrBinaryOutputImage;
@@ -29,47 +24,47 @@ Java_software_happybubble_PictureProcessing_imageProcessing(
     float min[3], max[3];
     cvtColor(img_input, img_binaryOutput, CV_BGR2RGB);
 
-    if(h > 225) {
-        min[0] = h - 30;
+    if(colorR > 225) {
+        min[0] = colorR - 30;
         max[0] = 255;
     }
-    else if(h < 30) {
+    else if(colorR < 30) {
         min[0] = 0;
-        max[0] = h + 30;
+        max[0] = colorR + 30;
     }
     else {
-        min[0] = h - 30;
-        max[0] = h + 30;
+        min[0] = colorR - 30;
+        max[0] = colorR + 30;
     }
 
-    if(s > 225) {
-        min[1] = s - 30;
+    if(colorG > 225) {
+        min[1] = colorG - 30;
         max[1] = 255;
     }
-    else if(s < 30) {
+    else if(colorG < 30) {
         min[1] = 0;
-        max[1] = s + 30;
+        max[1] = colorG + 30;
     }
     else {
-        min[1] = s - 30;
-        max[1] = s + 30;
+        min[1] = colorG - 30;
+        max[1] = colorG + 30;
     }
 
-    if(v > 225) {
-        min[2] = v - 30;
+    if(colorB > 225) {
+        min[2] = colorB - 30;
         max[2] = 255;
     }
-    else if(v < 30) {
+    else if(colorB < 30) {
         min[2] = 0;
-        max[2] = v + 30;
+        max[2] = colorB + 30;
     }
     else {
-        min[2] = v - 30;
-        max[2] = v + 30;
+        min[2] = colorB - 30;
+        max[2] = colorB + 30;
     }
-    inRange(img_binaryOutput, Scalar(min[2], min[1], min[0]), Scalar(max[2], max[1], max[0]), temp_mask);
+    inRange(img_binaryOutput, Scalar(min[2], min[1], min[0]), Scalar(max[2], max[1], max[0]), img_binaryOutput);
 
-    img_input.copyTo(img_colorOutput, temp_mask);
+    img_input.copyTo(img_colorOutput, img_binaryOutput);
 }
 
 JNIEXPORT void JNICALL
