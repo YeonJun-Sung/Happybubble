@@ -20,7 +20,8 @@ Java_software_happybubble_PictureProcessing_imageProcessing(
     Mat &img_input = *(Mat *) addrInputImage;
     Mat &img_binaryOutput = *(Mat *) addrBinaryOutputImage;
     Mat &img_colorOutput = *(Mat *) addrColorOutputImage;
-    Mat temp_mask;
+    Mat temp_binary(cvSize(200, 200), CV_8UC1);
+    Mat temp_color(cvSize(200, 200), CV_8UC1);
     float min[3], max[3];
     cvtColor(img_input, img_binaryOutput, CV_BGR2RGB);
 
@@ -63,6 +64,8 @@ Java_software_happybubble_PictureProcessing_imageProcessing(
         max[2] = colorB + 30;
     }
     inRange(img_binaryOutput, Scalar(min[2], min[1], min[0]), Scalar(max[2], max[1], max[0]), img_binaryOutput);
+    resize(img_binaryOutput, img_binaryOutput, temp_binary.size());
+    resize(img_input, img_input, temp_binary.size());
 
     img_input.copyTo(img_colorOutput, img_binaryOutput);
 }
@@ -82,8 +85,8 @@ ava_software_happybubble_ImageProcessingActivity_imageProcessing(
     cvtColor(img_input, img_output, CV_BGR2HSV);
 }
 
-JNIEXPORT jstring JNICALL
-Java_software_happybubble_ImageProcessingActivity_imageLableing(
+JNIEXPORT jint JNICALL
+Java_software_happybubble_GetImage_imageLableing(
         JNIEnv *env,
         jobject obj,
         jlong addrInputImage,
@@ -91,8 +94,7 @@ Java_software_happybubble_ImageProcessingActivity_imageLableing(
         jlong addrCentroidsImage) {
     Mat &img_input = *(Mat *) addrInputImage;
     Mat &stats = *(Mat *) addrStatsImage;
-    Mat &centroids = *(Mat *) addrStatsImage;
-    Mat statsTemp, centroidsTemp;
+    Mat &centroids = *(Mat *) addrCentroidsImage;
     Mat binary_output, erode_output, dilate_output, labeling_output;
     Mat mask = getStructuringElement(MORPH_RECT, Size(3, 3), Point(1, 1));
 
@@ -113,36 +115,16 @@ Java_software_happybubble_ImageProcessingActivity_imageLableing(
             morphology_output.at<uchar>(h, w) = abs(
                     binary_output.at<uchar>(h, w) - dilate_output.at<uchar>(h, w));
 
-    int numOfLables = connectedComponentsWithStats(morphology_output, labeling_output, statsTemp, centroidsTemp, 8, CV_32S);
+    int numOfLables = connectedComponentsWithStats(morphology_output, labeling_output, stats, centroids, 8, CV_32S);
 
-    char *info = "";
-    char *temp = "1";
-    for (int j = 1; j < numOfLables; j++) {
-        int area = statsTemp.at<int>(j, CC_STAT_AREA);
-        int left = statsTemp.at<int>(j, CC_STAT_LEFT);
-        int top = statsTemp.at<int>(j, CC_STAT_TOP);
-        int width = statsTemp.at<int>(j, CC_STAT_WIDTH);
-        int height = statsTemp.at<int>(j, CC_STAT_HEIGHT);
-
-        int x = centroidsTemp.at<double>(j, 0); //중심좌표
-        int y = centroidsTemp.at<double>(j, 1);
-
-        if(width > 200 && height > 200){
-            //sprintf(info,"%d,%d,%d,%d,%d,%d,%d",area,left,top,width,height,x,y);
-            strcat(info, temp);
-        }
-    }
-    jstring result;
-    result = env->NewStringUTF("test");
-    return result;
+    return numOfLables;
 }
 
-JNIEXPORT void JNICALL
-Java_software_happybubble_ImageProcessingActivity_getLableingImg(
+JNIEXPORT jboolean JNICALL
+Java_software_happybubble_GetImage_getLableingImg(
         JNIEnv *env,
         jobject obj,
         jint numOfLables,
-        jint returnLable,
         jlong addrInputImage,
         jlong addrOutputImage,
         jlong addrStatsImage,
@@ -151,31 +133,21 @@ Java_software_happybubble_ImageProcessingActivity_getLableingImg(
     Mat &img_output = *(Mat *) addrOutputImage;
     Mat &stats = *(Mat *) addrStatsImage;
     Mat &centroids = *(Mat *) addrCentroidsImage;
-    int lableFilter = 0;
 
-    printf("return : %d\n", returnLable);
-    printf("lable : %d\n", lableFilter);
-    //morphology_output.copyTo(img_input);
-    for (int j = 1; j < numOfLables; j++) {
-        int area = stats.at<int>(j, CC_STAT_AREA);
-        int left = stats.at<int>(j, CC_STAT_LEFT);
-        int top = stats.at<int>(j, CC_STAT_TOP);
-        int width = stats.at<int>(j, CC_STAT_WIDTH);
-        int height = stats.at<int>(j, CC_STAT_HEIGHT);
+    int area = stats.at<int>(numOfLables, CC_STAT_AREA);
+    int left = stats.at<int>(numOfLables, CC_STAT_LEFT);
+    int top = stats.at<int>(numOfLables, CC_STAT_TOP);
+    int width = stats.at<int>(numOfLables, CC_STAT_WIDTH);
+    int height = stats.at<int>(numOfLables, CC_STAT_HEIGHT);
 
-        int x = centroids.at<double>(j, 0); //중심좌표
-        int y = centroids.at<double>(j, 1);
+    int x = centroids.at<double>(numOfLables, 0); //중심좌표
+    int y = centroids.at<double>(numOfLables, 1);
 
-        if(width > 200 && height > 200){
-            circle(img_input, Point(x, y), 5, Scalar(0, 255, 0), 1);
-            rectangle(img_input, Point(left, top), Point(left + width, top + height), Scalar(255, 0, 0), 5);
-            //lableingImg[result++].create(height, width, CV_8UC1);
-            Rect roi(left, top, width, height);
-            img_output = img_input(roi).clone();
-            //env->CallVoidMethod(obj, cb, env->NewStringUTF("Lable"));
-            if(returnLable == lableFilter)  break;
-            lableFilter++;
-        }
+    if (width > 200 && height > 200) {
+        Rect roi(left, top, width, height);
+        img_output = img_input(roi).clone();
+        return true;
     }
+    else return false;
 }
 }

@@ -33,41 +33,38 @@ public class SelectClipart extends AppCompatActivity {
     RelativeLayout background;
     ArrayAdapter<String> adapter;
 
-    String[] fileName = {"ascent.png", "bicycle priority road.png", "bicycle road.png", "changing lane-left.png"
-            , "changing lane-right.png", "child protection area.png", "concession line.png", "concession.png"
-            , "crosswalk.png", "derivation lane.png", "derivation-round.png", "derivation-square.png"
-            , "derivation-triangle.png", "disabled person protection area.png", "Don't go straight.png"
-            , "don't stop.png", "Don't turn left and go straight.png", "Don't turn left.png"
-            , "Don't turn right and go straight.png", "Don't turn right and left.png", "Don't turn right.png"
-            , "elderly protection area.png", "go straight or turn left.png", "go straight or turn right.png"
-            , "go straight.png", "inclined parking.png", "lead wire.png", "parallel parking.png"
-            , "right angle parking.png", "safety zone.png", "slowly-mark.png", "slowly-text.png"
-            , "speed limit(child protection).png", "speed limit.png", "stop.png", "turn left or u-turn.png"
-            , "turn left.png", "turn right.png", "U-turn prohibited.png", "U-turn.png", "unprotected turning.png"
-            , "emoticon01.png", "emoticon02.png", "emoticon03.png", "emoticon04.png"
-            , "emoticon05.png", "emoticon06.png", "emoticon07.png", "emoticon08.png"
-            , "emoticon09.png", "emoticon10.png", "emoticon11.png", "emoticon12.png"
-            , "emoticon13.png", "emoticon14.png", "emoticon15.png", "emoticon16.png", "test.png"};
+    String getUrl;
+    String[] fileName;
     Bitmap[] image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_clipart);
+        Intent intent = getIntent();
+        fileName = intent.getStringArrayExtra("fileName");
+        getUrl = intent.getExtras().getString("url");
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         activity = this;
         adapter = new ArrayAdapter<String>(activity, android.R.layout.select_dialog_singlechoice);
 
-        AssetManager path = getResources().getAssets();
-        InputStream is;
         image = new Bitmap[fileName.length];
         try {
             for(int i = 0;i < fileName.length;i++){
                 adapter.add(fileName[i].replace(".png",""));
-                is = path.open(fileName[i]);
-                image[i] = BitmapFactory.decodeStream(is);
-                is.reset();
+                if(getUrl.equals("resource")) {
+                    AssetManager path = getResources().getAssets();
+                    InputStream is;
+                    is = path.open(fileName[i]);
+                    image[i] = BitmapFactory.decodeStream(is);
+                    is.reset();
+                }
+                else if(getUrl.equals("cacheDir")) {
+                    Log.d("path",getExternalCacheDir().getPath());
+                    image[i] = BitmapFactory.decodeFile(getExternalCacheDir().getPath() + "/" + fileName[i]);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,6 +124,7 @@ public class SelectClipart extends AppCompatActivity {
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), fileName[imgIdx], Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), PictureProcessing.class);
+                intent.putExtra("url", getUrl);
                 intent.putExtra("img", fileName[imgIdx]);
                 startActivity(intent);
             }

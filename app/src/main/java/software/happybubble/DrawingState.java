@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,7 +26,8 @@ public class DrawingState extends AppCompatActivity {
     Bitmap getImage;
     private Socket socket;
     BufferedInputStream bis;
-    String ip = "192.168.219.103";
+    EditText setIP;
+    String ip = "192.168.0.14";
     int port = 8765;
     int[] paperSize, color;
 
@@ -35,11 +39,15 @@ public class DrawingState extends AppCompatActivity {
         getImage = (Bitmap) intent.getParcelableExtra("img");
         color = intent.getIntArrayExtra("color");
         paperSize = intent.getIntArrayExtra("size");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         ImageView image = (ImageView)findViewById(R.id.drawImage);
         Button draw = (Button)findViewById(R.id.drawBt);
         TextView colorRGB = (TextView)findViewById(R.id.checkColor);
         TextView checkSize = (TextView)findViewById(R.id.checkSize);
+        setIP = (EditText)findViewById(R.id.setIP);
+        setIP.setText(ip);
 
         image.setImageBitmap(getImage);
         colorRGB.setText("R : " + color[0] + " / G : " + color[1] + " / B : " + color[2]);
@@ -51,6 +59,7 @@ public class DrawingState extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), "draw",Toast.LENGTH_SHORT).show();
+                ip = setIP.getText().toString();
                 Thread send = new Thread(){
                     public void run(){
                         try{
@@ -84,6 +93,7 @@ public class DrawingState extends AppCompatActivity {
             }
         });
     }
+
     private byte[] getByte(int num) {
         byte[] buf = new byte[4];
         buf[0] = (byte)( (num >>> 24) & 0xFF );
@@ -92,5 +102,14 @@ public class DrawingState extends AppCompatActivity {
         buf[3] = (byte)( (num >>>  0) & 0xFF );
 
         return buf;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

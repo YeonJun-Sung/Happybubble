@@ -323,7 +323,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
         Bitmap bm;
 
         if (resultCode == RESULT_OK) {
-            if (requestCode == 1 && !data.equals(null)) {
+            if (requestCode == REQUEST_CAMERA && !data.equals(null)) {
                 try {
                     Bundle extras = data.getExtras();
                     if(extras != null) {
@@ -334,7 +334,7 @@ public class ImageProcessingActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (requestCode == 2 && !data.equals(null)) {
+            } else if (requestCode == REQUEST_ALBUM && !data.equals(null)) {
                 try {
                     bm = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
                     imageVIewInput.setImageBitmap(bm);

@@ -33,7 +33,7 @@ import java.io.InputStream;
 
 public class PictureProcessing extends AppCompatActivity {
     Bitmap inputImage;
-    String getImageName;
+    String getImageName, getUrl;
     ImageView showImage;
     AlertDialog.Builder alertW, alertH;
     EditText widthText, heightText;
@@ -42,8 +42,6 @@ public class PictureProcessing extends AppCompatActivity {
     int[] cValue = {0, 0, 0};
     int[] paperSize = {1000, 1000};
     Mat img_input, img_colorOutput, img_binaryOutput;
-    static final int PERMISSION_REQUEST_CODE = 1;
-    String[] PERMISSIONS  = {"android.permission.WRITE_EXTERNAL_STORAGE"};
     Boolean checkBinary = false;
     Activity activity;
 
@@ -72,41 +70,44 @@ public class PictureProcessing extends AppCompatActivity {
         try {
             Intent intent = getIntent();
             getImageName = intent.getExtras().getString("img");
-            AssetManager path = getResources().getAssets();
-            InputStream is;
-            is = path.open(getImageName);
-            inputImage = BitmapFactory.decodeStream(is);
+            getUrl = intent.getExtras().getString("url");
+            if(getUrl.equals("resource")) {
+                AssetManager path = getResources().getAssets();
+                InputStream is;
+                is = path.open(getImageName);
+                inputImage = BitmapFactory.decodeStream(is);
+            }
+            else if(getUrl.equals("cacheDir")) {
+                Log.d("path",getExternalCacheDir().getPath());
+                inputImage = BitmapFactory.decodeFile(getExternalCacheDir().getPath() + "/" + getImageName);
+            }
             showImage.setImageBitmap(inputImage);
         } catch (IOException e) {
             e.printStackTrace();
         }
         Toast.makeText(getApplicationContext(),"set",Toast.LENGTH_SHORT).show();
 
-        if (!hasPermissions(PERMISSIONS))
-            requestNecessaryPermissions(PERMISSIONS);
-        else {
-            rBt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    imageprocess_and_showResult();
-                    checkBinary = true;
-                }
-            });
-            gBt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    imageprocess_and_showResult();
-                    checkBinary = true;
-                }
-            });
-            bBt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    imageprocess_and_showResult();
-                    checkBinary = true;
-                }
-            });
-        }
+        rBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageprocess_and_showResult();
+                checkBinary = true;
+            }
+        });
+        gBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageprocess_and_showResult();
+                checkBinary = true;
+            }
+        });
+        bBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageprocess_and_showResult();
+                checkBinary = true;
+            }
+        });
 
         rBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -144,26 +145,6 @@ public class PictureProcessing extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) { }
         });
-    }
-
-    private boolean hasPermissions(String[] permissions) {
-        int ret = 0;
-        //스트링 배열에 있는 퍼미션들의 허가 상태 여부 확인
-        for (String perms : permissions){
-            ret = checkCallingOrSelfPermission(perms);
-            if (!(ret == PackageManager.PERMISSION_GRANTED)){
-                //퍼미션 허가 안된 경우
-                return false;
-            }
-        }
-        //모든 퍼미션이 허가된 경우
-        return true;
-    }
-    private void requestNecessaryPermissions(String[] permissions) {
-        //마시멜로( API 23 )이상에서 런타임 퍼미션(Runtime Permission) 요청
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(permissions, PERMISSION_REQUEST_CODE);
-        }
     }
 
     public void setButtonsBackgroundColor(){

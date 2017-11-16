@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".GetImage" />
         <activity android:name=".SelectClipart" />
         <activity android:name=".PictureProcessing" />
         <activity android:name=".DrawingState" />
