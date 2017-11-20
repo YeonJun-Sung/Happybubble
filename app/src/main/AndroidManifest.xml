@@ -23,8 +23,6 @@
         <activity android:name=".SelectClipart" />
         <activity android:name=".PictureProcessing" />
         <activity android:name=".DrawingState" />
-        <activity android:name=".ImageProcessingActivity"
-            android:hardwareAccelerated="false"/>
     </application>
 
 </manifest>

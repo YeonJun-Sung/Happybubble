@@ -55,12 +55,9 @@ public class GetImage extends AppCompatActivity {
         mode = intent.getExtras().getInt("mode");
 
         read_image_file();
-        if(mode == REQUEST_ALBUM) {
-            Toast.makeText(getApplicationContext(), "ALBUM TODO", Toast.LENGTH_SHORT).show();
-            doTakeAlbumAction();
-        }
+        if(mode == REQUEST_ALBUM)   doTakeAlbumAction();
         else if(mode == REQUEST_CAMERA) {
-            Toast.makeText(getApplicationContext(), "CAMERA TODO", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "CAMERA 화질 개선 TODO", Toast.LENGTH_SHORT).show();
             doTakePhotoAction();
         }
 
@@ -78,39 +75,41 @@ public class GetImage extends AppCompatActivity {
         lableingBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Lableing image TODO", Toast.LENGTH_SHORT).show();
-
                 int numberOfLables = imageLableing(img_input.getNativeObjAddr(), img_stats.getNativeObjAddr(), img_centroids.getNativeObjAddr());
                 int lableNum = 0;
-                for(int i = 1;i < numberOfLables;i++) {
-                    if(getLableingImg(i, img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), img_stats.getNativeObjAddr(), img_centroids.getNativeObjAddr())){
+                Log.d("lable", ""+numberOfLables);
+                for (int i = 1; i < numberOfLables; i++) {
+                    if (getLableingImg(i, img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), img_stats.getNativeObjAddr(), img_centroids.getNativeObjAddr())) {
                         Bitmap imgSaveTemp = Bitmap.createBitmap(img_output.cols(), img_output.rows(), Bitmap.Config.ARGB_8888);
                         Utils.matToBitmap(img_output, imgSaveTemp);
                         String fileNm = "lableImg" + lableNum + ".png";
                         lableList.add(fileNm);
                         lableNum++;
-                        try{
+                        try {
                             File saveImg = new File(getExternalCacheDir(), fileNm);
                             FileOutputStream fos = new FileOutputStream(saveImg);
                             imgSaveTemp.compress(Bitmap.CompressFormat.PNG, 100, fos);
                             fos.flush();
                             fos.close();
-                            Log.d("file","save " + fileNm);
+                            Log.d("file", "save " + fileNm);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }
-                fileName = new String[lableList.size()];
-                for(int i = 0;i < lableList.size();i++) fileName[i] = lableList.get(i);
-                lableingCheck = true;
-                Toast.makeText(getApplicationContext(), "객체 나누기 완료", Toast.LENGTH_SHORT).show();
+                if(lableList.size() != 0) {
+                    fileName = new String[lableList.size()];
+                    for (int i = 0; i < lableList.size(); i++) fileName[i] = lableList.get(i);
+                    lableingCheck = true;
+                    Toast.makeText(getApplicationContext(), "객체 나누기 완료", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(getApplicationContext(), "나누어질 객체가 없습니다.", Toast.LENGTH_SHORT).show();
             }
         });
         nextBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Send Image TODO", Toast.LENGTH_SHORT).show();
                 Intent intent;
                 Url = "cacheDir";
                 if(lableingCheck){
