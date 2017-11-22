@@ -18,18 +18,21 @@ import android.widget.Toast;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
 public class DrawingState extends AppCompatActivity {
+    int error;
     InetAddress serverAddr;
     Bitmap getImage;
     private Socket socket;
     BufferedInputStream bis;
     EditText setIP;
-    String ip = "192.168.0.14";
+    String ip = "192.168.14.214";
     int port = 8765;
     int[] paperSize, color;
+    Boolean socketError = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,27 +65,44 @@ public class DrawingState extends AppCompatActivity {
                 ip = setIP.getText().toString();
                 Thread send = new Thread(){
                     public void run(){
-                        try{
+                        try {
                             serverAddr = InetAddress.getByName(ip);
+
                             socket = new Socket(serverAddr, port);
-                            DataOutputStream os = new DataOutputStream(socket.getOutputStream());
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            getImage.compress(Bitmap.CompressFormat.PNG, 100, out);
-                            byte[] imgData = out.toByteArray();
-                            byte[] size = getByte(imgData.length);
-                            byte[] width = getByte(paperSize[0]);
-                            byte[] height = getByte(paperSize[1]);
-                            Log.d("send data", "" + imgData);
-                            Log.d("send data", "" + size);
-                            Log.d("send data", "" + paperSize[0] + ", " + paperSize[1]);
-                            os.write(size, 0, size.length);
-                            os.flush();
-                            os.write(imgData, 0, imgData.length);
-                            os.flush();
-                            os.write(width, 0, width.length);
-                            os.flush();
-                            os.write(height, 0, height.length);
-                            os.flush();
+
+                            while (socketError) {
+
+                                DataOutputStream os = new DataOutputStream(socket.getOutputStream());
+                                ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                                getImage.compress(Bitmap.CompressFormat.PNG, 100, out);
+                                byte[] imgData = out.toByteArray();
+                                byte[] size = getByte(imgData.length);
+                                byte[] width = getByte(paperSize[0]);
+                                byte[] height = getByte(paperSize[1]);
+                                Log.d("send data", "" + imgData);
+                                Log.d("send data", "" + size);
+                                Log.d("send data", "" + paperSize[0] + ", " + paperSize[1]);
+                                os.write(size, 0, size.length);
+                                os.flush();
+                                os.write(imgData, 0, imgData.length);
+                                os.flush();
+                                os.write(width, 0, width.length);
+                                os.flush();
+                                os.write(height, 0, height.length);
+                                os.flush();
+
+                                InputStream inputStream = socket.getInputStream();
+
+                                error = inputStream.read();
+
+                                if(error != 100)
+                                    socketError = false;
+
+                                else
+                                    socketError = true;
+
+                            }
                             socket.close();
                         } catch (Exception e){
                             e.printStackTrace();
