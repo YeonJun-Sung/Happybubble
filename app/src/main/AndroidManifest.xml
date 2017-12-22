@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA2" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -12,17 +13,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".SelectMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Select_Picture" />
-        <activity android:name=".Select_Show_Picture" />
-        <activity android:name=".ImageProcessingActivity" />
-        <activity android:name=".Select_Mode"></activity>
+        <activity android:name=".GetImage" />
+        <activity android:name=".SelectClipart" />
+        <activity android:name=".PictureProcessing" />
+        <activity android:name=".DrawingState" />
     </application>
 
 </manifest>
