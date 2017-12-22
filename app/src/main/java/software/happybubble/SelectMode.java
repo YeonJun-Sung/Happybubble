@@ -10,13 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class SelectMode extends AppCompatActivity {
     Button album, camera, clipart;
     static final int REQUEST_CAMERA = 1;
     static final int REQUEST_ALBUM = 2;
-    String[] fileName = {"ascent.png", "bicycle priority road.png", "bicycle road.png", "changing lane-left.png"
+    static final int PERMISSION_REQUEST_CODE = 1;
+    String[] file_name = {"ascent.png", "bicycle priority road.png", "bicycle road.png", "changing lane-left.png"
             , "changing lane-right.png", "child protection area.png", "concession line.png", "concession.png"
             , "crosswalk.png", "derivation lane.png", "derivation-round.png", "derivation-square.png"
             , "derivation-triangle.png", "disabled person protection area.png", "Don't go straight.png"
@@ -30,9 +30,7 @@ public class SelectMode extends AppCompatActivity {
             , "emoticon01.png", "emoticon02.png", "emoticon03.png", "emoticon04.png"
             , "emoticon05.png", "emoticon06.png", "emoticon07.png", "emoticon08.png"
             , "emoticon09.png", "emoticon10.png", "emoticon11.png", "emoticon12.png"
-            , "emoticon13.png", "emoticon14.png", "emoticon15.png", "emoticon16.png", "test.png"};
-
-    static final int PERMISSION_REQUEST_CODE = 1;
+            , "emoticon13.png", "emoticon14.png", "emoticon15.png", "emoticon16.png"};
     String[] PERMISSIONS  = {"android.permission.WRITE_EXTERNAL_STORAGE"};
     Activity activity;
 
@@ -52,9 +50,6 @@ public class SelectMode extends AppCompatActivity {
             album.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(getApplicationContext(),"show album TODO",Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(),"image lableing TODO",Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(getApplicationContext(), GetImage.class);
                     intent.putExtra("mode", REQUEST_ALBUM);
                     startActivity(intent);
@@ -63,10 +58,6 @@ public class SelectMode extends AppCompatActivity {
             camera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(getApplicationContext(),"open camera  TODO",Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(),"get save picture  TODO",Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(),"image lableing TODO",Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(getApplicationContext(), GetImage.class);
                     intent.putExtra("mode", REQUEST_CAMERA);
                     startActivity(intent);
@@ -76,7 +67,7 @@ public class SelectMode extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(getApplicationContext(), SelectClipart.class);
-                    intent.putExtra("fileName", fileName);
+                    intent.putExtra("fileName", file_name);
                     intent.putExtra("url", "resource");
                     startActivity(intent);
                 }
@@ -86,38 +77,29 @@ public class SelectMode extends AppCompatActivity {
 
     private boolean hasPermissions(String[] permissions) {
         int ret = 0;
-        //스트링 배열에 있는 퍼미션들의 허가 상태 여부 확인
         for (String perms : permissions){
             ret = checkCallingOrSelfPermission(perms);
             if (!(ret == PackageManager.PERMISSION_GRANTED)){
-                //퍼미션 허가 안된 경우
                 return false;
             }
-
         }
-        //모든 퍼미션이 허가된 경우
         return true;
     }
 
     private void requestNecessaryPermissions(String[] permissions) {
-        //마시멜로( API 23 )이상에서 런타임 퍼미션(Runtime Permission) 요청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permissions, PERMISSION_REQUEST_CODE);
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
-        switch(permsRequestCode){
-
+    public void onRequestPermissionsResult(int perms_request_code, String[] permissions, int[] grant_results){
+        switch(perms_request_code){
             case PERMISSION_REQUEST_CODE:
-                if (grantResults.length > 0) {
-                    boolean writeAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-
+                if (grant_results.length > 0) {
+                    boolean writeAccepted = grant_results[1] == PackageManager.PERMISSION_GRANTED;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                        if (!writeAccepted )
-                        {
+                        if (!writeAccepted ) {
                             showDialogforPermission("앱을 실행하려면 퍼미션을 허가하셔야합니다.");
                             return;
                         }
@@ -129,11 +111,11 @@ public class SelectMode extends AppCompatActivity {
 
     private void showDialogforPermission(String msg) {
 
-        final AlertDialog.Builder myDialog = new AlertDialog.Builder(activity);
-        myDialog.setTitle("알림");
-        myDialog.setMessage(msg);
-        myDialog.setCancelable(false);
-        myDialog.setPositiveButton("예", new DialogInterface.OnClickListener() {
+        final AlertDialog.Builder my_dialog = new AlertDialog.Builder(activity);
+        my_dialog.setTitle("알림");
+        my_dialog.setMessage(msg);
+        my_dialog.setCancelable(false);
+        my_dialog.setPositiveButton("예", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface arg0, int arg1) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
@@ -141,11 +123,11 @@ public class SelectMode extends AppCompatActivity {
 
             }
         });
-        myDialog.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+        my_dialog.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface arg0, int arg1) {
                 finish();
             }
         });
-        myDialog.show();
+        my_dialog.show();
     }
 }

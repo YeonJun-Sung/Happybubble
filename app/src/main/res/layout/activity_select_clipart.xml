@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,7 +8,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
-
         <Button
             android:id="@+id/draw"
             android:layout_width="match_parent"
@@ -20,11 +18,12 @@
             android:layout_marginRight="30sp"
             android:text=""/>
     </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:id="@+id/bgImg">
+        android:id="@+id/bg_img">
         <Button
             android:id="@+id/pre"
             android:layout_marginLeft="30sp"

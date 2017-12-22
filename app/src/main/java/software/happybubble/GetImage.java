@@ -1,46 +1,42 @@
 package software.happybubble;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class GetImage extends AppCompatActivity {
-    ImageView showImage;
-    Button removeBt, lableingBt, nextBt;
     static final int REQUEST_CAMERA = 1;
     static final int REQUEST_ALBUM = 2;
-    Boolean lableingCheck = false;
-    String[] fileName;
-    String originFileNm = "origin.png";
-    String Url;
-    int lableingIdx = 0;
-    int mode;
-    Mat img_input, img_output, img_stats, img_centroids;
-    ArrayList<String> lableList = new ArrayList<String>();
+    ImageView show_image;
+    Button remove_bt, lableing_bt, next_bt;
+    Boolean lableing_check = false;
+    String[] file_name;
+    String[] parse_num;
+    String origin_file_nm = "origin.png";
+    String url;
+    String number_of_lables;
+    int mode, i;
+    int lable_num = 0;
+    Mat img_origin, img_input, img_output, img_stats;
+    ArrayList<String> lable_list = new ArrayList<String>();
+    Boolean remove_state = true;
+    Boolean lable_state = true;
+    Boolean processing_state = true;
 
     static {
         System.loadLibrary("opencv_java3");
@@ -55,84 +51,135 @@ public class GetImage extends AppCompatActivity {
         mode = intent.getExtras().getInt("mode");
 
         read_image_file();
-        if(mode == REQUEST_ALBUM)   doTakeAlbumAction();
-        else if(mode == REQUEST_CAMERA) {
-            Toast.makeText(getApplicationContext(), "CAMERA 화질 개선 TODO", Toast.LENGTH_SHORT).show();
-            doTakePhotoAction();
-        }
 
-        showImage = (ImageView) findViewById(R.id.showImage);
-        removeBt = (Button) findViewById(R.id.removeBt);
-        lableingBt = (Button) findViewById(R.id.lableingBt);
-        nextBt = (Button) findViewById(R.id.nextBt);
+        show_image = (ImageView) findViewById(R.id.show_image);
+        remove_bt = (Button) findViewById(R.id.remove_bt);
+        lableing_bt = (Button) findViewById(R.id.lableing_bt);
+        next_bt = (Button) findViewById(R.id.next_bt);
 
-        removeBt.setOnClickListener(new View.OnClickListener() {
+        remove_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Remove background TODO", Toast.LENGTH_SHORT).show();
-            }
-        });
-        lableingBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int numberOfLables = imageLableing(img_input.getNativeObjAddr(), img_stats.getNativeObjAddr(), img_centroids.getNativeObjAddr());
-                int lableNum = 0;
-                Log.d("lable", ""+numberOfLables);
-                for (int i = 1; i < numberOfLables; i++) {
-                    if (getLableingImg(i, img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), img_stats.getNativeObjAddr(), img_centroids.getNativeObjAddr())) {
-                        Bitmap imgSaveTemp = Bitmap.createBitmap(img_output.cols(), img_output.rows(), Bitmap.Config.ARGB_8888);
-                        Utils.matToBitmap(img_output, imgSaveTemp);
-                        String fileNm = "lableImg" + lableNum + ".png";
-                        lableList.add(fileNm);
-                        lableNum++;
-                        try {
-                            File saveImg = new File(getExternalCacheDir(), fileNm);
-                            FileOutputStream fos = new FileOutputStream(saveImg);
-                            imgSaveTemp.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                            fos.flush();
-                            fos.close();
-                            Log.d("file", "save " + fileNm);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                if(lableList.size() != 0) {
-                    fileName = new String[lableList.size()];
-                    for (int i = 0; i < lableList.size(); i++) fileName[i] = lableList.get(i);
-                    lableingCheck = true;
-                    Toast.makeText(getApplicationContext(), "객체 나누기 완료", Toast.LENGTH_SHORT).show();
-                }
-                else
-                    Toast.makeText(getApplicationContext(), "나누어질 객체가 없습니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
-        nextBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent;
-                Url = "cacheDir";
-                if(lableingCheck){
-                    intent = new Intent(getApplicationContext(), SelectClipart.class);
-                    intent.putExtra("url", Url);
-                    intent.putExtra("fileName", fileName);
-                    startActivity(intent);
+                processing_state = false;
+                Bitmap bitmap_output;
+                if(remove_state) {
+                    removeBackground(img_input.getNativeObjAddr(), img_output.getNativeObjAddr());
+                    bitmap_output = Bitmap.createBitmap(img_output.cols(), img_output.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(img_output, bitmap_output);
+                    show_image.setImageBitmap(bitmap_output);
+                    img_input.copyTo(img_origin);
+                    img_output.copyTo(img_input);
+                    remove_bt.setText("원본 보기");
+                    remove_state = false;
                 }
                 else {
-                    intent = new Intent(getApplicationContext(), PictureProcessing.class);
-                    intent.putExtra("url", Url);
-                    intent.putExtra("img", originFileNm);
-                    startActivity(intent);
+                    img_origin.copyTo(img_input);
+                    bitmap_output = Bitmap.createBitmap(img_input.cols(), img_input.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(img_input, bitmap_output);
+                    show_image.setImageBitmap(bitmap_output);
+                    remove_state = true;
+                    remove_bt.setText("배경 제거");
+                }
+                try {
+                    File save_img = new File(getExternalCacheDir(), origin_file_nm);
+                    FileOutputStream fos = new FileOutputStream(save_img);
+                    bitmap_output.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                    fos.flush();
+                    fos.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                processing_state = true;
+            }
+        });
+        lableing_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                processing_state = false;
+                if(lable_state) {
+                    Thread img_process_thread = new Thread() {
+                        public void run() {
+                            number_of_lables = imageLableing(img_input.getNativeObjAddr(), img_stats.getNativeObjAddr());
+                            parse_num = number_of_lables.split(",");
+                            lable_num = 0;
+                            lable_list.clear();
+
+                            for (i = 0; i < parse_num.length; i++) {
+                                if(parse_num[i].equals(""))  continue;
+                                getLableingImg(Integer.parseInt(parse_num[i]), img_input.getNativeObjAddr(), img_output.getNativeObjAddr(), img_stats.getNativeObjAddr());
+                                Bitmap img_save_temp = Bitmap.createBitmap(img_output.cols(), img_output.rows(), Bitmap.Config.ARGB_8888);
+                                Utils.matToBitmap(img_output, img_save_temp);
+                                String file_nm = "lableImg" + lable_num + ".png";
+                                lable_list.add(file_nm);
+                                lable_num++;
+                                try {
+                                    File save_img = new File(getExternalCacheDir(), file_nm);
+                                    FileOutputStream fos = new FileOutputStream(save_img);
+                                    img_save_temp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                                    fos.flush();
+                                    fos.close();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            if(lable_list.size() != 0) {
+                                file_name = new String[lable_list.size()];
+                                for (int j = 0; j < lable_list.size(); j++) file_name[j] = lable_list.get(j);
+                                lableing_check = true;
+                            }
+                            processing_state = true;
+                        }
+                    };
+                    img_process_thread.start();
+                    lableing_bt.setText("원본 보기");
+                    lable_state = false;
+                }
+                else {
+                    Bitmap bitmap_origin = Bitmap.createBitmap(img_input.cols(), img_input.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(img_input, bitmap_origin);
+                    show_image.setImageBitmap(bitmap_origin);
+                    lableing_bt.setText("객체 나누기");
+                    lable_state = true;
+                    processing_state = true;
+                    lableing_check = false;
                 }
             }
         });
+        next_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(processing_state) {
+                    Intent intent;
+                    url = "cacheDir";
+                    if (lableing_check) {
+                        intent = new Intent(getApplicationContext(), SelectClipart.class);
+                        intent.putExtra("url", url);
+                        intent.putExtra("fileName", file_name);
+                        startActivity(intent);
+                    } else {
+                        intent = new Intent(getApplicationContext(), PictureProcessing.class);
+                        intent.putExtra("url", url);
+                        intent.putExtra("img", origin_file_nm);
+                        startActivity(intent);
+                    }
+                }
+                else
+                    Toast.makeText(getApplicationContext(), "이미지 처리 중입니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        if(mode == REQUEST_ALBUM) {
+            doTakeAlbumAction();
+        }
+        else if(mode == REQUEST_CAMERA) {
+            doTakePhotoAction();
+        }
     }
 
     private void read_image_file() {
+        img_origin = new Mat();
         img_input = new Mat();
         img_output = new Mat();
         img_stats = new Mat();
-        img_centroids = new Mat();
     }
 
     private void doTakePhotoAction() {
@@ -164,23 +211,23 @@ public class GetImage extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int request_code, int result_code, Intent data) {
         Bitmap bm;
-        Matrix rotateMatrix = new Matrix();
+        Matrix rotate_matrix = new Matrix();
 
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_CAMERA && !data.equals(null)) {
+        if (result_code == RESULT_OK) {
+            if (request_code == REQUEST_CAMERA && !data.equals(null)) {
                 try {
                     Bundle extras = data.getExtras();
                     if(extras != null) {
                         bm = extras.getParcelable("data");
-                        rotateMatrix.postRotate(90);
-                        bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), rotateMatrix, false);
-                        showImage.setImageBitmap(bm);
+                        rotate_matrix.postRotate(90);
+                        bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), rotate_matrix, false);
+                        show_image.setImageBitmap(bm);
                         Utils.bitmapToMat(bm, img_input);
                         try {
-                            File saveImg = new File(getExternalCacheDir(), originFileNm);
-                            FileOutputStream fos = new FileOutputStream(saveImg);
+                            File save_img = new File(getExternalCacheDir(), origin_file_nm);
+                            FileOutputStream fos = new FileOutputStream(save_img);
                             bm.compress(Bitmap.CompressFormat.PNG, 100, fos);
                             fos.flush();
                             fos.close();
@@ -191,17 +238,17 @@ public class GetImage extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (requestCode == REQUEST_ALBUM && !data.equals(null)) {
+            } else if (request_code == REQUEST_ALBUM && !data.equals(null)) {
                 try {
                     bm = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
-                    rotateMatrix.postRotate(90);
-                    bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), rotateMatrix, false);
-                    showImage.setImageBitmap(bm);
+                    rotate_matrix.postRotate(90);
+                    bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), rotate_matrix, false);
+                    show_image.setImageBitmap(bm);
                     Utils.bitmapToMat(bm, img_input);
-                    showImage.setScaleType(ImageView.ScaleType.FIT_XY);
+                    show_image.setScaleType(ImageView.ScaleType.FIT_XY);
                     try {
-                        File saveImg = new File(getExternalCacheDir(), originFileNm);
-                        FileOutputStream fos = new FileOutputStream(saveImg);
+                        File save_img = new File(getExternalCacheDir(), origin_file_nm);
+                        FileOutputStream fos = new FileOutputStream(save_img);
                         bm.compress(Bitmap.CompressFormat.PNG, 100, fos);
                         fos.flush();
                         fos.close();
@@ -224,6 +271,7 @@ public class GetImage extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public native int imageLableing(long inputImage, long statsImage, long centroidsImage);
-    public native boolean getLableingImg(int numberOfLables, long addrInputImage, long addrOutputImage,long addrStatsImage, long addrCentroidsImage);
+    public native String imageLableing(long input_image, long stats_image);
+    public native void getLableingImg(int number_of_lables, long addr_input_image, long addr_output_image, long addr_stats_image);
+    public native void removeBackground(long addr_input_image, long addr_output_image);
 }

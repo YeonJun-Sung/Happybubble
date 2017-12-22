@@ -1,48 +1,37 @@
 package software.happybubble;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class PictureProcessing extends AppCompatActivity {
-    Bitmap inputImage;
-    String getImageName, getUrl;
-    ImageView showImage;
-    AlertDialog.Builder alertW, alertH;
-    EditText widthText, heightText;
-    Button rBt, gBt, bBt;
-    SeekBar rBar, gBar, bBar;
-    int[] cValue = {0, 0, 0};
-    int[] paperSize = {1000, 1000};
-    Mat img_input, img_colorOutput, img_binaryOutput;
-    Boolean checkBinary = false;
+    Bitmap input_image;
+    String get_image_name, get_url;
+    ImageView show_image;
+    Button r_bt, g_bt, b_bt;
+    SeekBar r_bar, g_bar, b_bar;
+    int[] c_value = {0, 0, 0};
+    Mat img_input, img_color_output, img_binary_output;
+    Boolean check_binary = false;
     Activity activity;
 
     static {
@@ -54,121 +43,119 @@ public class PictureProcessing extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_processing);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar action_bar = getSupportActionBar();
+        action_bar.setDisplayHomeAsUpEnabled(true);
 
         activity = this;
-        showImage = (ImageView)findViewById(R.id.showImage);
-        rBt = (Button)findViewById(R.id.rBt);
-        gBt = (Button)findViewById(R.id.gBt);
-        bBt = (Button)findViewById(R.id.bBt);
-        rBar = (SeekBar)findViewById(R.id.rBar);
-        gBar = (SeekBar)findViewById(R.id.gBar);
-        bBar = (SeekBar)findViewById(R.id.bBar);
+        show_image = (ImageView)findViewById(R.id.show_image);
+        r_bt = (Button)findViewById(R.id.r_bt);
+        g_bt = (Button)findViewById(R.id.g_bt);
+        b_bt = (Button)findViewById(R.id.b_bt);
+        r_bar = (SeekBar)findViewById(R.id.r_bar);
+        g_bar = (SeekBar)findViewById(R.id.g_bar);
+        b_bar = (SeekBar)findViewById(R.id.b_bar);
         setButtonsBackgroundColor();
 
         try {
             Intent intent = getIntent();
-            getImageName = intent.getExtras().getString("img");
-            getUrl = intent.getExtras().getString("url");
-            if(getUrl.equals("resource")) {
+            get_image_name = intent.getExtras().getString("img");
+            get_url = intent.getExtras().getString("url");
+            if(get_url.equals("resource")) {
                 AssetManager path = getResources().getAssets();
                 InputStream is;
-                is = path.open(getImageName);
-                inputImage = BitmapFactory.decodeStream(is);
+                is = path.open(get_image_name);
+                input_image = BitmapFactory.decodeStream(is);
             }
-            else if(getUrl.equals("cacheDir")) {
-                Log.d("path",getExternalCacheDir().getPath());
-                inputImage = BitmapFactory.decodeFile(getExternalCacheDir().getPath() + "/" + getImageName);
+            else if(get_url.equals("cacheDir")) {
+                input_image = BitmapFactory.decodeFile(getExternalCacheDir().getPath() + "/" + get_image_name);
             }
-            showImage.setImageBitmap(inputImage);
+            show_image.setImageBitmap(input_image);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Toast.makeText(getApplicationContext(),"set",Toast.LENGTH_SHORT).show();
 
-        rBt.setOnClickListener(new View.OnClickListener() {
+        r_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 imageprocess_and_showResult();
-                checkBinary = true;
+                check_binary = true;
             }
         });
-        gBt.setOnClickListener(new View.OnClickListener() {
+        g_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 imageprocess_and_showResult();
-                checkBinary = true;
+                check_binary = true;
             }
         });
-        bBt.setOnClickListener(new View.OnClickListener() {
+        b_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 imageprocess_and_showResult();
-                checkBinary = true;
+                check_binary = true;
             }
         });
 
-        rBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        r_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                cValue[0] = i;
-                rBt.setText("R : " + cValue[0]);
+            public void onProgressChanged(SeekBar seek_bar, int i, boolean b) {
+                c_value[0] = i;
+                r_bt.setText("R : " + c_value[0]);
                 setButtonsBackgroundColor();
             }
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
+            public void onStartTrackingTouch(SeekBar seek_bar) { }
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
+            public void onStopTrackingTouch(SeekBar seek_bar) { }
         });
-        gBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        g_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                cValue[1] = i;
-                gBt.setText("G : " + cValue[1]);
+            public void onProgressChanged(SeekBar seek_bar, int i, boolean b) {
+                c_value[1] = i;
+                g_bt.setText("G : " + c_value[1]);
                 setButtonsBackgroundColor();
             }
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
+            public void onStartTrackingTouch(SeekBar seek_bar) { }
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
+            public void onStopTrackingTouch(SeekBar seek_bar) { }
         });
-        bBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        b_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                cValue[2] = i;
-                bBt.setText("B : " + cValue[2]);
+            public void onProgressChanged(SeekBar seek_bar, int i, boolean b) {
+                c_value[2] = i;
+                b_bt.setText("B : " + c_value[2]);
                 setButtonsBackgroundColor();
             }
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
+            public void onStartTrackingTouch(SeekBar seek_bar) { }
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
+            public void onStopTrackingTouch(SeekBar seek_bar) { }
         });
     }
 
     public void setButtonsBackgroundColor(){
-        rBt.setBackgroundColor(Color.rgb(cValue[0], cValue[1], cValue[2]));
-        gBt.setBackgroundColor(Color.rgb(cValue[0], cValue[1], cValue[2]));
-        bBt.setBackgroundColor(Color.rgb(cValue[0], cValue[1], cValue[2]));
-        rBt.setTextColor(Color.rgb(255 - cValue[0], 255 - cValue[1], 255 - cValue[2]));
-        gBt.setTextColor(Color.rgb(255 - cValue[0], 255 - cValue[1], 255 - cValue[2]));
-        bBt.setTextColor(Color.rgb(255 - cValue[0], 255 - cValue[1], 255 - cValue[2]));
+        r_bt.setBackgroundColor(Color.rgb(c_value[0], c_value[1], c_value[2]));
+        g_bt.setBackgroundColor(Color.rgb(c_value[0], c_value[1], c_value[2]));
+        b_bt.setBackgroundColor(Color.rgb(c_value[0], c_value[1], c_value[2]));
+        r_bt.setTextColor(Color.rgb(255 - c_value[0], 255 - c_value[1], 255 - c_value[2]));
+        g_bt.setTextColor(Color.rgb(255 - c_value[0], 255 - c_value[1], 255 - c_value[2]));
+        b_bt.setTextColor(Color.rgb(255 - c_value[0], 255 - c_value[1], 255 - c_value[2]));
     }
 
     private void read_image_file() {
         img_input = new Mat();
-        img_colorOutput = new Mat();
-        img_binaryOutput = new Mat();
+        img_color_output = new Mat();
+        img_binary_output = new Mat();
     }
 
     private void imageprocess_and_showResult() {
         read_image_file();
-        Utils.bitmapToMat(inputImage, img_input);
-        imageProcessing(img_input.getNativeObjAddr(), img_binaryOutput.getNativeObjAddr(), img_colorOutput.getNativeObjAddr(), cValue[0], cValue[1], cValue[2]);
-        Bitmap bitmapOutput = Bitmap.createBitmap(img_colorOutput.cols(), img_colorOutput.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(img_colorOutput, bitmapOutput);
-        showImage.setImageBitmap(bitmapOutput);
+        Utils.bitmapToMat(input_image, img_input);
+        imageProcessing(img_input.getNativeObjAddr(), img_binary_output.getNativeObjAddr(), img_color_output.getNativeObjAddr(), img_input.cols(), img_input.rows(), c_value[0], c_value[1], c_value[2]);
+        Bitmap bitmapOutput = Bitmap.createBitmap(img_color_output.cols(), img_color_output.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(img_color_output, bitmapOutput);
+        show_image.setImageBitmap(bitmapOutput);
     }
 
 
@@ -185,83 +172,36 @@ public class PictureProcessing extends AppCompatActivity {
                 return true;
             case R.id.origin:
                 read_image_file();
-                Utils.bitmapToMat(inputImage, img_input);
+                Utils.bitmapToMat(input_image, img_input);
                 Bitmap bitmapInput = Bitmap.createBitmap(img_input.cols(), img_input.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(img_input, bitmapInput);
-                showImage.setImageBitmap(bitmapInput);
-                checkBinary = false;
-                return true;
-            case R.id.setsize:
-                alertW = new AlertDialog.Builder(activity);
-                alertH = new AlertDialog.Builder(activity);
-
-                alertW.setTitle("용지 크기를 설정해주세요.");
-                alertW.setMessage("용지 너비를 입력해주세요. (단위 : mm)");
-                alertH.setTitle("용지 크기를 설정해주세요.");
-                alertH.setMessage("용지 높이를 입력해주세요. (단위 : mm)");
-                widthText = new EditText(activity);
-                heightText = new EditText(activity);
-                widthText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                heightText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                widthText.setHint("미 입력시 " + paperSize[0] + " mm");
-                heightText.setHint("미 입력시 " + paperSize[0] + " mm");
-                alertW.setView(widthText);
-                alertH.setView(heightText);
-                alertW.setPositiveButton("다음", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String getW = widthText.getText().toString();
-                        if(getW.equals("")) paperSize[0] = 1000;
-                        else {
-                            paperSize[0] = Integer.parseInt(getW);
-                            if(paperSize[0] <= 0)   paperSize[0] = 1000;
-                        }
-                        dialogInterface.dismiss();
-                        alertH.show();
-                    }
-                });
-                alertW.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-
-                alertH.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String getH = heightText.getText().toString();
-                        if(getH.equals(""))  paperSize[1] = 1000;
-                        else {
-                            paperSize[1] = Integer.parseInt(getH);
-                            if(paperSize[1] <= 0)   paperSize[1] = 1000;
-                        }
-                        dialogInterface.dismiss();
-                    }
-                });
-                alertH.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                alertW.show();
+                show_image.setImageBitmap(bitmapInput);
+                check_binary = false;
                 return true;
             case R.id.draw:
-                if (checkBinary) {
+                if (check_binary) {
+                    String binary_file_nm = "binary_img.png";
                     Intent intent = new Intent(getApplicationContext(), DrawingState.class);
-                    Bitmap bitmapIntent = Bitmap.createBitmap(img_binaryOutput.cols(), img_binaryOutput.rows(), Bitmap.Config.ARGB_8888);
-                    Utils.matToBitmap(img_binaryOutput, bitmapIntent);
-                    intent.putExtra("img", bitmapIntent);
-                    intent.putExtra("size", paperSize);
-                    intent.putExtra("color", cValue);
+                    Bitmap bitmap_binary = Bitmap.createBitmap(img_binary_output.cols(), img_binary_output.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(img_binary_output, bitmap_binary);
+                    try {
+                        File save_img = new File(getExternalCacheDir(), binary_file_nm);
+                        FileOutputStream fos = new FileOutputStream(save_img);
+                        bitmap_binary.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                        fos.flush();
+                        fos.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    intent.putExtra("img", binary_file_nm);
+                    intent.putExtra("color", c_value);
                     startActivity(intent);
                 }
-                else if (!checkBinary) Toast.makeText(getApplicationContext(),"색상을 선택해주세요.",Toast.LENGTH_SHORT).show();
+                else if (!check_binary) Toast.makeText(getApplicationContext(),"색상을 선택해주세요.",Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public native void imageProcessing(long inputImage, long binaryOutputImage, long colorOutputImage, float colorR, float colorG, float colorB);
+    public native void imageProcessing(long input_image, long binary_output_image, long color_output_image, float origin_w, float origin_h, float color_r, float color_g, float color_b);
 }
